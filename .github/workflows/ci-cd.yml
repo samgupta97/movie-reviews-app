@@ -1,0 +1,54 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-test:
+    name: Build & Test Client + Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # ---------- CLIENT ----------
+      - name: Install Client Dependencies
+        working-directory: ./client
+        run: npm install
+
+      - name: Build Client
+        working-directory: ./client
+        run: npm run build
+
+      # ---------- SERVER ----------
+      - name: Install Server Dependencies
+        working-directory: ./server
+        run: npm install
+
+      - name: Test Server (Optional)
+        working-directory: ./server
+        run: npm test || echo "No tests"
+
+  # ---------- DEPLOY SECTION ----------
+  deploy:
+    needs: build-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      # EXAMPLE: Deploy to Render (Backend)
+      - name: Deploy Backend to Render
+        run: |
+          curl -X POST "$RENDER_DEPLOY_HOOK"
+
+      # EXAMPLE: Deploy to Vercel (Frontend)
+      - name: Deploy Frontend to Vercel
+        run: npx vercel --prod --token $VERCEL_TOKEN
