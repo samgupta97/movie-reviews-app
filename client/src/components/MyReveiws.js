@@ -12,20 +12,27 @@ function MyReviews() {
 
     const userId = localStorage.getItem("user_id");
 
-    const fetchReviews = () => {
-        axios.get(`http://localhost:4005/myreviews/${userId}`)
-            .then(resp => setData(resp.data.data))
-            .catch(err => console.log(err));
-    };
-
+    // FETCH REVIEWS
     useEffect(() => {
+        const fetchReviews = () => {
+            axios.get(`http://localhost:4005/myreviews/${userId}`)
+                .then(resp => setData(resp.data.data))
+                .catch(err => console.log(err));
+        };
         fetchReviews();
-    }, []);
+    }, [userId]); // Added userId as dependency
 
     // DELETE REVIEW
     const handleDelete = (id) => {
         axios.delete(`http://localhost:4005/myreviews/${id}`)
-            .then(() => fetchReviews())
+            .then(() => {
+                const fetchReviews = () => {
+                    axios.get(`http://localhost:4005/myreviews/${userId}`)
+                        .then(resp => setData(resp.data.data))
+                        .catch(err => console.log(err));
+                };
+                fetchReviews();
+            })
             .catch(err => console.log(err));
     };
 
@@ -43,6 +50,11 @@ function MyReviews() {
             rating: editingRating
         }).then(() => {
             setEditingId(null);
+            const fetchReviews = () => {
+                axios.get(`http://localhost:4005/myreviews/${userId}`)
+                    .then(resp => setData(resp.data.data))
+                    .catch(err => console.log(err));
+            };
             fetchReviews();
         }).catch(err => console.log(err));
     };
@@ -51,7 +63,7 @@ function MyReviews() {
     const submitShare = () => {
         axios.post("http://localhost:4005/share", {
             review_id: shareId,
-            user_id: shareToUserId   // receiver user id
+            user_id: shareToUserId
         })
             .then(() => {
                 alert("Review shared!");
@@ -223,7 +235,6 @@ function MyReviews() {
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

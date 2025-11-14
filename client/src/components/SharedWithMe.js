@@ -9,9 +9,8 @@ function SharedWithMe() {
         axios.get(`http://localhost:4005/shared-with-me/${userId}`)
             .then(resp => setData(resp.data.data))
             .catch(err => console.log(err));
-    }, []);
+    }, [userId]); // Added userId as dependency
 
-    // same styles as MyReviews
     const containerStyle = {
         padding: "2rem",
         display: "flex",
