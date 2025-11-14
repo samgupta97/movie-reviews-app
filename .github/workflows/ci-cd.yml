@@ -35,7 +35,6 @@ jobs:
         working-directory: ./server
         run: npm test || echo "No tests"
 
-  # ---------- DEPLOY SECTION ----------
   deploy:
     needs: build-test
     runs-on: ubuntu-latest
@@ -44,11 +43,10 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      # EXAMPLE: Deploy to Render (Backend)
-      - name: Deploy Backend to Render
-        run: |
-          curl -X POST "$RENDER_DEPLOY_HOOK"
-
-      # EXAMPLE: Deploy to Vercel (Frontend)
+      # ---------- FRONTEND DEPLOY ----------
       - name: Deploy Frontend to Vercel
-        run: npx vercel --prod --token $VERCEL_TOKEN
+        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
+
+      # ---------- BACKEND DEPLOY ----------
+      - name: Deploy Backend to Render
+        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
